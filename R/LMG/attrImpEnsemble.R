@@ -22,7 +22,8 @@ NormalizedGini <- function(solution, submission) {
 library(leaps)
 library(dplyr)
 library(caret)
-setwd("/Users/swapnil.jamthe/work/Kaggle/LMG")
+library(caretEnsemble)
+setwd("/Users/swapnil/work/Kaggle/out/LMG")
 data<-read.csv("train.csv")
 data<-select(data,-(Id))
 
@@ -45,7 +46,7 @@ iter = 0;
 #imp<-imp[order(imp$`%IncMSE`,decreasing = TRUE),]
 #write.table(imp,file = "predictions/attrImp/imp",quote = FALSE,sep = ",",row.names = FALSE)
 
-imp<-read.csv("predictions/attrImpBoosted/imp")
+imp<-read.csv("attrImpBoosted/imp")
 
 imp<-imp[order(imp$IncNodePurity,decreasing=TRUE),]
 
@@ -56,11 +57,12 @@ bestGini = 0
 bestNumAttr = 0
 iter = 0;
 
-topStartAttr = 23
+topStartAttr = 29
+endAttr = 29
 ntree = 15000
 depth=25
 library(gbm)
-for(numAttr in seq(32,topStartAttr,-2))
+for(numAttr in seq(endAttr,topStartAttr,-2))
 {
   formulaStr = paste0("Hazard~",imp[1,"attr"])
   for(i in 2:numAttr)
@@ -70,6 +72,15 @@ for(numAttr in seq(32,topStartAttr,-2))
   print(formulaStr)
   print(paste0("Ver 1 : Training for numAttr=",numAttr))
   iter<-iter + 1
+  
+  modelList<-caretList(
+    as.formula(formulaStr), data=trainingData,
+    tuneList=list(
+      b=caretModelSpec(method='glmboost', tuneGrid=data.frame(mstop = 15000,prune=TRUE)),
+      r=caretModelSpec(method='rf', tuneGrid=data.frame(mtry=10))
+      
+    )
+  )
   
 }
 

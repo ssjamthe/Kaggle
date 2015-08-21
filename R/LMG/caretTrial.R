@@ -22,7 +22,7 @@ NormalizedGini <- function(solution, submission) {
 library(leaps)
 library(dplyr)
 library(caret)
-setwd("/Users/swapnil.jamthe/work/Kaggle/LMG")
+setwd("/Users/swapnil/work/Kaggle/out/LMG/")
 data<-read.csv("train.csv")
 data<-select(data,-(Id))
 
@@ -45,7 +45,7 @@ iter = 0;
 #imp<-imp[order(imp$`%IncMSE`,decreasing = TRUE),]
 #write.table(imp,file = "predictions/attrImp/imp",quote = FALSE,sep = ",",row.names = FALSE)
 
-imp<-read.csv("predictions/attrImpBoosted/imp")
+imp<-read.csv("attrImpBoosted/imp")
 
 imp<-imp[order(imp$IncNodePurity,decreasing=TRUE),]
 
