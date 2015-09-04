@@ -22,7 +22,7 @@ NormalizedGini <- function(solution, submission) {
 library(leaps)
 library(dplyr)
 library(caret)
-setwd("/Users/swapnil/work/Kaggle/out/LMG/")
+setwd("/Users/swapnil.jamthe/work/Kaggle/out/LMG/")
 data<-read.csv("train.csv")
 data<-select(data,-(Id))
 
@@ -66,7 +66,7 @@ for(i in 2:numAttr)
 }
 
 fitControl <- trainControl(
-  number = 1000)
+  number = 500)
 
 modelBoost <- train(as.formula(formulaStr), data = trainingData,
                  method = "gbm",
@@ -77,7 +77,7 @@ modelBoost <- train(as.formula(formulaStr), data = trainingData,
 
 predBoost<-predict(modelBoost,testFinal)
 predBoostFrame<-data.frame(Id=testFinal$Id,Hazard=predBoost)
-write.table(predBoostFrame,file = paste0("predictions/caretTrial/predBoost",depth,"_",ntree,"_",numAttr),quote = FALSE,sep = ",",row.names = FALSE)
+write.table(predBoostFrame,file = paste0("caretTrial/predBoost",depth,"_",ntree,"_",numAttr),quote = FALSE,sep = ",",row.names = FALSE)
 
 
 predCv<-predict(modelBoost,cvData)
