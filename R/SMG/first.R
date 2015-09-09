@@ -1,3 +1,9 @@
+set.seed(1988)
+library(leaps)
+library(dplyr)
+library(caret)
+library(randomForest)
+library(imputeR)
 setwd("/Users/swapnil/work/Kaggle/out/SMR")
 train<-read.csv("train.csv",stringsAsFactors=FALSE)
 test<-read.csv("test.csv",stringsAsFactors=FALSE)
@@ -58,5 +64,44 @@ test_date_int = do.call(cbind.data.frame, test_date_int)
 
 names(train_date_int) <- lapply(names(train_date_int),function(x){paste0(x,"_days")})
 names(test_date_int) <- lapply(names(test_date_int),function(x){paste0(x,"_days")})
+
+
+train_proc<-cbind(train_numr,train_char,train_hour,train_date_int)
+test_proc<-cbind(test_numr,test_char,test_hour,test_date_int)
+
+nas_in_cols_fraction<-sapply(names(train_proc),function(x){sum(is.na(train_proc[,x]))/nrow(train_proc)})
+cols_more_nas<-names(train_proc)[nas_in_cols_fraction>0.7]
+
+train_proc<-train_proc[,!names(train_proc) %in% cols_more_nas]
+test_proc<-test_proc[,!names(test_proc) %in% cols_more_nas]
+
+remove(col_ct)
+remove(train_numr)
+remove(train_char)
+remove(test_numr)
+remove(test_char)
+remove(train_date)
+remove(test_date)
+remove(train_time)
+remove(test_time)
+remove(train_hour)
+remove(test_hour)
+remove(train_date_int)
+remove(test_date_int)
+
+train_proc_imp<-impute(train_proc,lmFun = "lassoR",cFun = "lassoC")
+test_proc_imp<-impute(test_proc,lmFun = "lassoR",cFun = "lassoC")
+
+trainingIndex<-createDataPartition(y=train_proc$target,p=0.8,list=FALSE)
+trainingData<-train_proc[trainingIndex,]
+cvData<-train_proc[-trainingIndex,]
+trainingData<-select(trainingData,-(ID))
+trainingData$target = factor(trainingData$target)
+cvData$target = factor(cvData$target)
+
+modelRf<-randomForest(target~.,data=trainingData,ntree=100,importance=TRUE)
+
+
+
 
 
