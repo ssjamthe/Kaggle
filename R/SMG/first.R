@@ -9,10 +9,14 @@ train<-read.csv("train.csv",stringsAsFactors=FALSE)
 test<-read.csv("test.csv",stringsAsFactors=FALSE)
 test$target<-integer(nrow(test))
 
-col_ct = sapply(train, function(x) length(unique(x)))
+train<-select(train,-(ID))
+test<-select(test,-(ID))
+
+col_ct = sapply(train, function(x) length(unique(x[!is.na(x)])))
 cat("Constant feature count:", length(col_ct[col_ct==1]))
 
 train = train[, !names(train) %in% names(col_ct[col_ct==1])]
+test = test[, !names(test) %in% names(col_ct[col_ct==1])]
 
 train_numr = train[, sapply(train, is.numeric)]
 train_char = train[, sapply(train, is.character)]
@@ -65,12 +69,41 @@ test_date_int = do.call(cbind.data.frame, test_date_int)
 names(train_date_int) <- lapply(names(train_date_int),function(x){paste0(x,"_days")})
 names(test_date_int) <- lapply(names(test_date_int),function(x){paste0(x,"_days")})
 
+nas_in_cols_fraction<-sapply(names(train_numr),function(x){sum(is.na(train_numr[,x]))/nrow(train_numr)})
+cols_more_nas<-names(train_numr)[nas_in_cols_fraction>0.1]
+train_numr<-train_numr[,!names(train_numr) %in% cols_more_nas]
+test_numr<-test_numr[,!names(test_numr) %in% cols_more_nas]
+
+train_numr_imp<-impute(test_numr,lmFun = "lassoR",cFun = "lassoC",conv = FALSE)
+
+
+nas_in_cols_fraction<-sapply(names(train_char),function(x){sum(is.na(train_char[,x]))/nrow(train_char)})
+cols_more_nas<-names(train_char)[nas_in_cols_fraction>0.3]
+train_char<-train_char[,!names(train_char) %in% cols_more_nas]
+test_char<-train_char[,!names(test_char) %in% cols_more_nas]
+for(n in names(train_char))
+{
+  train_char[is.na(train_char[,n]),n] = 'UNKNOWN_IMPUTED'
+  test_char[is.na(test_char[,n]),n] = 'UNKNOWN_IMPUTED'
+}
+
+
+#nas_in_cols_fraction<-sapply(names(train_hour),function(x){sum(is.na(train_hour[,x]))/nrow(train_hour)})
+#cols_more_nas<-names(train_hour)[nas_in_cols_fraction>0.3]
+#train_hour<-train_hour[,!names(train_hour) %in% cols_more_nas]
+#train_hour<-train_hour[,!names(train_hour) %in% cols_more_nas]
+
+nas_in_cols_fraction<-sapply(names(train_date_int),function(x){sum(is.na(train_date_int[,x]))/nrow(train_date_int)})
+cols_more_nas<-names(train_date_int)[nas_in_cols_fraction>0.5]
+train_date_int<-train_date_int[,!names(train_date_int) %in% cols_more_nas]
+train_date_int<-train_date_int[,!names(train_date_int) %in% cols_more_nas]
+
 
 train_proc<-cbind(train_numr,train_char,train_hour,train_date_int)
 test_proc<-cbind(test_numr,test_char,test_hour,test_date_int)
 
 nas_in_cols_fraction<-sapply(names(train_proc),function(x){sum(is.na(train_proc[,x]))/nrow(train_proc)})
-cols_more_nas<-names(train_proc)[nas_in_cols_fraction>0.7]
+cols_more_nas<-names(train_proc)[nas_in_cols_fraction>0.5]
 
 train_proc<-train_proc[,!names(train_proc) %in% cols_more_nas]
 test_proc<-test_proc[,!names(test_proc) %in% cols_more_nas]
