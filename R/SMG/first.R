@@ -73,40 +73,81 @@ nas_in_cols_fraction<-sapply(names(train_numr),function(x){sum(is.na(train_numr[
 cols_more_nas<-names(train_numr)[nas_in_cols_fraction>0.1]
 train_numr<-train_numr[,!names(train_numr) %in% cols_more_nas]
 test_numr<-test_numr[,!names(test_numr) %in% cols_more_nas]
-
-train_numr_imp<-impute(test_numr,lmFun = "lassoR",cFun = "lassoC",conv = FALSE)
+for(n in names(train_numr))
+{
+  notNasTrain<-!is.na(train_numr[,n])
+  avgTrain<-sum(as.numeric(train_numr[notNasTrain,n]))/sum(notNasTrain)
+  notNasTest<-!is.na(test_numr[,n])
+  avgTest<-sum(as.numeric(test_numr[notNasTest,n]))/sum(notNasTest)
+  
+  if(class(train_numr[,n]) == "integer")
+  {
+    avgTrain<-as.integer(round(avgTrain))
+    avgTest<-as.integer(round(avgTest))
+  }
+  
+  train_numr[!notNasTrain,n]<-avgTrain
+  test_numr[!notNasTest,n]<-avgTest
+  nasTrain<-is.na(train_numr[,n])
+}
+#train_numr_imp<-impute(test_numr,lmFun = "lassoR",cFun = "lassoC",conv = FALSE)
 
 
 nas_in_cols_fraction<-sapply(names(train_char),function(x){sum(is.na(train_char[,x]))/nrow(train_char)})
 cols_more_nas<-names(train_char)[nas_in_cols_fraction>0.3]
 train_char<-train_char[,!names(train_char) %in% cols_more_nas]
-test_char<-train_char[,!names(test_char) %in% cols_more_nas]
+test_char<-test_char[,!names(test_char) %in% cols_more_nas]
 for(n in names(train_char))
 {
   train_char[is.na(train_char[,n]),n] = 'UNKNOWN_IMPUTED'
   test_char[is.na(test_char[,n]),n] = 'UNKNOWN_IMPUTED'
+  train_char[,n] = factor(train_char[,n])
+  test_char[,n] = factor(test_char[,n])
 }
+
+moreUnique<-sapply(names(train_char),function(x){length(unique(train_char[,x]))>53})
+colsMoreUnique<-names(train_char)[moreUnique]
+train_char<-train_char[,!names(train_char) %in% colsMoreUnique]
+test_char<-test_char[,!names(test_char) %in% colsMoreUnique]
 
 
 #nas_in_cols_fraction<-sapply(names(train_hour),function(x){sum(is.na(train_hour[,x]))/nrow(train_hour)})
 #cols_more_nas<-names(train_hour)[nas_in_cols_fraction>0.3]
 #train_hour<-train_hour[,!names(train_hour) %in% cols_more_nas]
-#train_hour<-train_hour[,!names(train_hour) %in% cols_more_nas]
+#test_hour<-test_hour[,!names(test_hour) %in% cols_more_nas]
+for(n in names(train_hour))
+{
+  notNasTrain<-!is.na(train_hour[,n])
+  avgTrain<-sum(as.numeric(train_hour[notNasTrain,n]))/sum(notNasTrain)
+  notNasTest<-!is.na(test_hour[,n])
+  avgTest<-sum(as.numeric(test_hour[notNasTest,n]))/sum(notNasTest)
+  avgTrain<-as.integer(round(avgTrain))
+  avgTest<-as.integer(round(avgTest))
+  
+  train_hour[!notNasTrain,n]<-avgTrain
+  test_hour[!notNasTest,n]<-avgTest
+}
 
 nas_in_cols_fraction<-sapply(names(train_date_int),function(x){sum(is.na(train_date_int[,x]))/nrow(train_date_int)})
 cols_more_nas<-names(train_date_int)[nas_in_cols_fraction>0.5]
 train_date_int<-train_date_int[,!names(train_date_int) %in% cols_more_nas]
-train_date_int<-train_date_int[,!names(train_date_int) %in% cols_more_nas]
+test_date_int<-test_date_int[,!names(test_date_int) %in% cols_more_nas]
+for(n in names(train_date_int))
+{
+  notNasTrain<-!is.na(train_date_int[,n])
+  avgTrain<-sum(as.numeric(train_date_int[notNasTrain,n]))/sum(notNasTrain)
+  notNasTest<-!is.na(test_date_int[,n])
+  avgTest<-sum(as.numeric(test_date_int[notNasTest,n]))/sum(notNasTest)
+  avgTrain<-as.integer(round(avgTrain))
+  avgTest<-as.integer(round(avgTest))
+  
+  train_date_int[!notNasTrain,n]<-avgTrain
+  test_date_int[!notNasTest,n]<-avgTest
+}
 
 
 train_proc<-cbind(train_numr,train_char,train_hour,train_date_int)
 test_proc<-cbind(test_numr,test_char,test_hour,test_date_int)
-
-nas_in_cols_fraction<-sapply(names(train_proc),function(x){sum(is.na(train_proc[,x]))/nrow(train_proc)})
-cols_more_nas<-names(train_proc)[nas_in_cols_fraction>0.5]
-
-train_proc<-train_proc[,!names(train_proc) %in% cols_more_nas]
-test_proc<-test_proc[,!names(test_proc) %in% cols_more_nas]
 
 remove(col_ct)
 remove(train_numr)
@@ -122,15 +163,15 @@ remove(test_hour)
 remove(train_date_int)
 remove(test_date_int)
 
-train_proc_imp<-impute(train_proc,lmFun = "lassoR",cFun = "lassoC")
-test_proc_imp<-impute(test_proc,lmFun = "lassoR",cFun = "lassoC")
+#train_proc_imp<-impute(train_proc,lmFun = "lassoR",cFun = "lassoC")
+#test_proc_imp<-impute(test_proc,lmFun = "lassoR",cFun = "lassoC")
 
 trainingIndex<-createDataPartition(y=train_proc$target,p=0.8,list=FALSE)
 trainingData<-train_proc[trainingIndex,]
 cvData<-train_proc[-trainingIndex,]
-trainingData<-select(trainingData,-(ID))
-trainingData$target = factor(trainingData$target)
-cvData$target = factor(cvData$target)
+#trainingData<-select(trainingData,-(ID))
+trainingData$target = factor(trainingData$target,levels=c("1","0"))
+cvData$target = factor(cvData$target,levels=c("1","0"))
 
 modelRf<-randomForest(target~.,data=trainingData,ntree=100,importance=TRUE)
 
