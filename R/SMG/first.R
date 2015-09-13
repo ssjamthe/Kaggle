@@ -4,13 +4,14 @@ library(dplyr)
 library(caret)
 library(randomForest)
 library(imputeR)
+library(AUC)
 setwd("/Users/swapnil/work/Kaggle/out/SMR")
+cat("loading data")
 train<-read.csv("train.csv",stringsAsFactors=FALSE)
 test<-read.csv("test.csv",stringsAsFactors=FALSE)
 test$target<-integer(nrow(test))
 
 train<-select(train,-(ID))
-test<-select(test,-(ID))
 
 col_ct = sapply(train, function(x) length(unique(x[!is.na(x)])))
 cat("Constant feature count:", length(col_ct[col_ct==1]))
@@ -99,10 +100,15 @@ train_char<-train_char[,!names(train_char) %in% cols_more_nas]
 test_char<-test_char[,!names(test_char) %in% cols_more_nas]
 for(n in names(train_char))
 {
+  cat("doing for ",n)
   train_char[is.na(train_char[,n]),n] = 'UNKNOWN_IMPUTED'
   test_char[is.na(test_char[,n]),n] = 'UNKNOWN_IMPUTED'
+  uniqueTrainVals<-unique(train_char[,n])
+  newTestValsInd<-sapply(test_char[,n],function(x){x %in% uniqueTrainVals})
+  test_char[!newTestValsInd,n] = 'UNKNOWN_IMPUTED'
   train_char[,n] = factor(train_char[,n])
   test_char[,n] = factor(test_char[,n])
+  levels(test_char[,n])<-levels(train_char[,n])
 }
 
 moreUnique<-sapply(names(train_char),function(x){length(unique(train_char[,x]))>53})
@@ -148,6 +154,7 @@ for(n in names(train_date_int))
 
 train_proc<-cbind(train_numr,train_char,train_hour,train_date_int)
 test_proc<-cbind(test_numr,test_char,test_hour,test_date_int)
+test_proc<-select(test_proc,-(target))
 
 remove(col_ct)
 remove(train_numr)
@@ -173,7 +180,16 @@ cvData<-train_proc[-trainingIndex,]
 trainingData$target = factor(trainingData$target,levels=c("1","0"))
 cvData$target = factor(cvData$target,levels=c("1","0"))
 
-modelRf<-randomForest(target~.,data=trainingData,ntree=100,importance=TRUE)
+cat("training rf")
+modelRf<-randomForest(target~.,data=trainingData,ntree=1,importance=TRUE)
+
+predRf<-predict(modelRf,test_proc)
+predRfFrame<-data.frame(Id=test_proc$ID,target=predRf)
+write.table(predRfFrame,file = "predictions/first/predRf_1",quote = FALSE,sep = ",",row.names = FALSE)
+predRfTrain<-predict(modelRf,trainingData)
+cat("train score : ",auc(roc(predictions = predRfTrain,labels = trainingData$target)))
+predRfCv<-predict(modelRf,cvData)
+cat("cv score : ",auc(roc(predictions = predRfCv,labels = cvData$target)))
 
 
 
