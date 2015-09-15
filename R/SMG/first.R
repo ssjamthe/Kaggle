@@ -179,12 +179,14 @@ cvData<-train_proc[-trainingIndex,]
 #trainingData<-select(trainingData,-(ID))
 trainingData$target = factor(trainingData$target,levels=c("1","0"))
 cvData$target = factor(cvData$target,levels=c("1","0"))
+#trainingData$target = as.numeric(trainingData$target)
+#cvData$target = as.numeric(cvData$target) 
 
 cat("training rf")
-modelRf<-randomForest(target~.,data=trainingData,ntree=1,importance=TRUE)
-
-predRf<-predict(modelRf,test_proc)
-predRfFrame<-data.frame(Id=test_proc$ID,target=predRf)
+modelRf<-randomForest(target~.,data=trainingData,ntree=100,importance=TRUE)
+#modelRf<-randomForest(x=select(trainingData,-(target)),y=trainingData$target,ntree=100)
+predRf<-predict(modelRf,test_proc,"prob")
+predRfFrame<-data.frame(Id=test_proc$ID,target=predRf[,1])
 write.table(predRfFrame,file = "predictions/first/predRf_1",quote = FALSE,sep = ",",row.names = FALSE)
 predRfTrain<-predict(modelRf,trainingData)
 cat("train score : ",auc(roc(predictions = predRfTrain,labels = trainingData$target)))
