@@ -186,12 +186,12 @@ modelMatTrain<-model.matrix(target~.-1,data = trainingData)
 modelMatCv<-model.matrix(target~.-1,data = cvData)
 modelMatTestFinal<-model.matrix(~.-1,data = test_proc)
 
-obs<-data.frame(rocscore=numeric(0),rocscoreTrain=numeric(0),ntree=integer(0),depth=integer(0),eta=integer(0))
+obs<-data.frame(iter=integer(0),rocscore=numeric(0),rocscoreTrain=numeric(0),ntree=integer(0),depth=integer(0),eta=integer(0))
 
 trials<-data.frame(ntree=integer(0),depth=integer(0),eta=integer(0))
-ntrees<-c(50)
-depths<-c(6)
-etas<-c(0.1)
+ntrees<-c(1,15,25,30,35,40,45,50,60,80)
+depths<-c(1,4,5,6,7,8,9,12,15,20)
+etas<-c(0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.5,0.6,0.7,0.8)
 
 for(ntree in ntrees)
 {
@@ -205,9 +205,12 @@ for(ntree in ntrees)
 }
 
 library(xgboost)
-
+iter = 0
+bestR<--1;
+bestIter<--1;
 for(it in 1:nrow(trials))
 {
+  iter = iter + 1;
   currEta<-trials[it,"eta"]
   currNtree<-trials[it,"ntree"]
   currDepth<-trials[it,"depth"]
@@ -218,12 +221,24 @@ for(it in 1:nrow(trials))
   
   modelBoost<-xgboost(data = currTrainMat, label = trainingData$target, max.depth = currDepth, eta = currEta, nthread = 2, nround = currNtree, objective = "binary:logistic",verbose=0)
   predBoost<-predict(modelBoost,currTestMat)
-  predBoostFrame<-data.frame(Id=testFinal$Id,target=predBoost)
-  write.table(predBoostFrame,file = paste0("predictions/xgBoost/predBoost","_",currNtree,"_",currDepth,"_",currEta,"_",numAttr,"_",iter),quote = FALSE,sep = ",",row.names = FALSE)
+  predBoostFrame<-data.frame(Id=test$ID,target=predBoost)
+  write.table(predBoostFrame,file = paste0("predictions/xgBoost/predBoost","_",currNtree,"_",currDepth,"_",currEta,"_",iter),quote = FALSE,sep = ",",row.names = FALSE)
   predCv<-predict(modelBoost,currCvMat)
-  r<-auc(roc(predictions = predCv,labels = cvData$target))
-  rtrain<-auc(roc(predictions = predict(modelBoost,currTrainMat),labels = trainingData$target))
+  r<-auc(roc(predictions = predCv,labels = factor(cvData$target)))
+  predTrain<-predict(modelBoost,currTrainMat)
+  rtrain<-auc(roc(predictions = predTrain,labels = factor(trainingData$target)))
   
-  obs<-rbind(obs,data.frame(rocscore=r,rocscoreTrain=rtrain,ntree=currNtree,depth=currDepth,eta=currEta))
+  obs<-rbind(obs,data.frame(iter=iter,rocscore=r,rocscoreTrain=rtrain,ntree=currNtree,depth=currDepth,eta=currEta))
+  currIterLog<-paste0("iter=",iter,",rocscore=",r,",rocscoreTrain=",rtrain,",ntree=",currNtree,",depth=",currDepth,",eta=",currEta)
+  print(currIterLog)
+  
+  
+  if(bestR < r)
+  {
+    bestR<-r
+    bestIter<-iter
+    
+    print(paste0("Best till now ",currIterLog))
+  }
   
 }
