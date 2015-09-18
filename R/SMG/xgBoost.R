@@ -222,7 +222,6 @@ for(it in 1:nrow(trials))
   modelBoost<-xgboost(data = currTrainMat, label = trainingData$target, max.depth = currDepth, eta = currEta, nthread = 2, nround = currNtree, objective = "binary:logistic",verbose=0)
   predBoost<-predict(modelBoost,currTestMat)
   predBoostFrame<-data.frame(Id=test$ID,target=predBoost)
-  write.table(predBoostFrame,file = paste0("predictions/xgBoost/predBoost","_",currNtree,"_",currDepth,"_",currEta,"_",iter),quote = FALSE,sep = ",",row.names = FALSE)
   predCv<-predict(modelBoost,currCvMat)
   r<-auc(roc(predictions = predCv,labels = factor(cvData$target)))
   predTrain<-predict(modelBoost,currTrainMat)
@@ -239,6 +238,9 @@ for(it in 1:nrow(trials))
     bestIter<-iter
     
     print(paste0("Best till now ",currIterLog))
+    
+    write.table(predBoostFrame,file = paste0("predictions/xgBoost/predBoost","_",currNtree,"_",currDepth,"_",currEta,"_",iter),quote = FALSE,sep = ",",row.names = FALSE)
+    
   }
   
 }
