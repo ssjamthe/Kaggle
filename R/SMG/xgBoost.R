@@ -5,7 +5,7 @@ library(caret)
 library(randomForest)
 library(imputeR)
 library(AUC)
-setwd("/Users/swapnil/work/Kaggle/out/SMR")
+setwd("/Users/swapnil.jamthe/work/Kaggle/out/SMR")
 cat("loading data")
 train<-read.csv("train.csv",stringsAsFactors=FALSE)
 test<-read.csv("test.csv",stringsAsFactors=FALSE)
@@ -189,9 +189,9 @@ modelMatTestFinal<-model.matrix(~.-1,data = test_proc)
 obs<-data.frame(iter=integer(0),rocscore=numeric(0),rocscoreTrain=numeric(0),ntree=integer(0),depth=integer(0),eta=integer(0))
 
 trials<-data.frame(ntree=integer(0),depth=integer(0),eta=integer(0))
-ntrees<-c(1,15,25,30,35,40,45,50,60,80)
-depths<-c(1,4,5,6,7,8,9,12,15,20)
-etas<-c(0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.5,0.6,0.7,0.8)
+ntrees<-c(25,30,35,40,45,50,60,80)
+depths<-c(4,5,6,7,8,9,12,15)
+etas<-c(0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.5,0.6)
 
 for(ntree in ntrees)
 {
@@ -203,6 +203,8 @@ for(ntree in ntrees)
     }
   }
 }
+
+cat("iter,rocscore,rocscoreTrain,ntree,depth,eta\n",file="obs/xgboost/obs.txt",append=FALSE)
 
 library(xgboost)
 iter = 0
@@ -231,9 +233,15 @@ for(it in 1:nrow(trials))
   currIterLog<-paste0("iter=",iter,",rocscore=",r,",rocscoreTrain=",rtrain,",ntree=",currNtree,",depth=",currDepth,",eta=",currEta)
   print(currIterLog)
   
+  csvLog<-paste0(iter,r,rtrain,currNtree,currDepth,currEta,"\n")
+  cat(csvLog,file="obs/xgboost/obs.txt",append=TRUE)
+  
   
   if(bestR < r)
   {
+    
+    print(paste0("Best till now ",currIterLog,":: lastBest=",bestR,",lastBestIter=",bestIter))
+    
     bestR<-r
     bestIter<-iter
     
