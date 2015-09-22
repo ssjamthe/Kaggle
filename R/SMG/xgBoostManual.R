@@ -188,23 +188,16 @@ modelMatTestFinal<-model.matrix(~.-1,data = test_proc)
 
 obs<-data.frame(iter=integer(0),rocscore=numeric(0),rocscoreTrain=numeric(0),ntree=integer(0),depth=integer(0),eta=integer(0))
 
+#25,6,0.3
+#50,6,0.1
 trials<-data.frame(ntree=integer(0),depth=integer(0),eta=integer(0))
-ntrees<-c(35,40,45,50,60,80)
-depths<-c(4,5,6,7,8,9,12,15)
-etas<-c(0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.5,0.6)
-
-for(ntree in ntrees)
-{
-  for(depth in depths)
-  {
-    for(eta in etas)
-    {
-      trials<-rbind(trials,data.frame(ntree=ntree,depth=depth,eta=eta))
-    }
-  }
-}
-
-#cat("iter,rocscore,rocscoreTrain,ntree,depth,eta\n",file="obs/xgboost/obs.txt",append=FALSE)
+trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.145))
+trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.1455))
+trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.1465))
+trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.147))
+trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.1475))
+trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.148))
+#cat("iter,rocscore,rocscoreTrain,ntree,depth,eta\n",file="obs/xgboostManual/obs.txt",append=FALSE)
 
 library(xgboost)
 iter = 0
@@ -234,7 +227,7 @@ for(it in 1:nrow(trials))
   print(currIterLog)
   
   csvLog<-paste0(iter,r,rtrain,currNtree,currDepth,currEta,"\n")
-  cat(csvLog,file="obs/xgboost/obs.txt",append=TRUE)
+  cat(csvLog,file="obs/xgboostManual/obs.txt",append=TRUE)
   
   
   if(bestR < r)
@@ -247,8 +240,10 @@ for(it in 1:nrow(trials))
     
     print(paste0("Best till now ",currIterLog))
     
-    write.table(predBoostFrame,file = paste0("predictions/xgBoost/predBoost","_",currNtree,"_",currDepth,"_",currEta,"_",iter),quote = FALSE,sep = ",",row.names = FALSE)
+    write.table(predBoostFrame,file = paste0("predictions/xgBoostManual/predBoost","_",currNtree,"_",currDepth,"_",currEta,"_",iter),quote = FALSE,sep = ",",row.names = FALSE)
     
   }
   
 }
+
+
