@@ -177,12 +177,15 @@ cvData<-train_proc[-trainingIndex,]
 trainingData$target = as.numeric(trainingData$target)
 cvData$target = as.numeric(cvData$target) 
 
+fullModelMat<-model.matrix(~.,data = train_proc)
+preProc<-preProcess(fullModelMat)
+processedFullModelMat<-predict(preProc,fullModelMat)
 modelMatTrain<-model.matrix(target~.,data = trainingData)
 modelMatCv<-model.matrix(~.,data = cvData)
 modelMatTestFinal<-model.matrix(~.,data = test_proc)
 
 
-subsetVars<-regsubsets(target~.,trainingData,nvmax = 1991,really.big = T,method="forward")
+subsetVars<-regsubsets(target~.,data.frame(processedFullModelMat),nvmax = 1991,really.big = T,method="forward")
 subsetSummary<-summary(subsetVars)
 par(mfrow=c(2,2))
 plot(subsetSummary$rss,xlab="Number of Variables",ylab = "RSS",type="l")
@@ -220,8 +223,8 @@ bicModNum<-which.min(subsetSummary$bic)
 
 metric="adjr2"
 coefiAdjr2<-coef(subsetVars,id=adjr2ModNum)
-modelMatTrain<-modelMatTrain[,c(names(coefiAdjr2),"target")]
-modelMatCv<-modelMatCv[,c(names(coefiAdjr2),"target")]
+modelMatTrain<-modelMatTrain[,names(coefiAdjr2)]
+modelMatCv<-modelMatCv[,names(coefiAdjr2)]
 
 #modelFrameTrainAdjr2<-data.frame(modelMatTrainAdjr2)
 #modelFrameTrainAdjr2$target<-trainingData$target
@@ -231,28 +234,63 @@ obs<-data.frame(iter=integer(0),rocscore=numeric(0),rocscoreTrain=numeric(0),ntr
 trials<-data.frame(ntree=integer(0),depth=integer(0),eta=integer(0))
 trials<-rbind(trials,data.frame(ntree=2,depth=2,eta=0.06))
 
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.06))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.08))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.1))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.12))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.14))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.16))
-
-trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.06))
 trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.08))
 trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.1))
-trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.12))
-trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.14))
-trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.16))
+trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.15))
+trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.2))
+trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.25))
+trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.3))
+trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.35))
+trials<-rbind(trials,data.frame(ntree=50,depth=5,eta=0.4))
 
-trials<-rbind(trials,data.frame(ntree=50,depth=7,eta=0.06))
-trials<-rbind(trials,data.frame(ntree=50,depth=7,eta=0.08))
-trials<-rbind(trials,data.frame(ntree=50,depth=7,eta=0.1))
-trials<-rbind(trials,data.frame(ntree=50,depth=7,eta=0.12))
-trials<-rbind(trials,data.frame(ntree=50,depth=7,eta=0.14))
-trials<-rbind(trials,data.frame(ntree=50,depth=7,eta=0.16))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.08))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.1))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.15))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.2))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.25))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.3))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.35))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.4))
 
-cat("iter,rocscore,rocscoreTrain,ntree,depth,eta,metric\n",file="obs/forwardSelection/obs.txt",append=FALSE)
+
+trials<-rbind(trials,data.frame(ntree=45,depth=5,eta=0.08))
+trials<-rbind(trials,data.frame(ntree=45,depth=5,eta=0.1))
+trials<-rbind(trials,data.frame(ntree=45,depth=5,eta=0.15))
+trials<-rbind(trials,data.frame(ntree=45,depth=5,eta=0.2))
+trials<-rbind(trials,data.frame(ntree=45,depth=5,eta=0.25))
+trials<-rbind(trials,data.frame(ntree=45,depth=5,eta=0.3))
+trials<-rbind(trials,data.frame(ntree=45,depth=5,eta=0.35))
+trials<-rbind(trials,data.frame(ntree=45,depth=5,eta=0.4))
+
+trials<-rbind(trials,data.frame(ntree=45,depth=6,eta=0.08))
+trials<-rbind(trials,data.frame(ntree=45,depth=6,eta=0.1))
+trials<-rbind(trials,data.frame(ntree=45,depth=6,eta=0.15))
+trials<-rbind(trials,data.frame(ntree=45,depth=6,eta=0.2))
+trials<-rbind(trials,data.frame(ntree=45,depth=6,eta=0.25))
+trials<-rbind(trials,data.frame(ntree=45,depth=6,eta=0.3))
+trials<-rbind(trials,data.frame(ntree=45,depth=6,eta=0.35))
+trials<-rbind(trials,data.frame(ntree=45,depth=6,eta=0.4))
+
+trials<-rbind(trials,data.frame(ntree=40,depth=5,eta=0.08))
+trials<-rbind(trials,data.frame(ntree=40,depth=5,eta=0.1))
+trials<-rbind(trials,data.frame(ntree=40,depth=5,eta=0.15))
+trials<-rbind(trials,data.frame(ntree=40,depth=5,eta=0.2))
+trials<-rbind(trials,data.frame(ntree=40,depth=5,eta=0.25))
+trials<-rbind(trials,data.frame(ntree=40,depth=5,eta=0.3))
+trials<-rbind(trials,data.frame(ntree=40,depth=5,eta=0.35))
+trials<-rbind(trials,data.frame(ntree=40,depth=5,eta=0.4))
+
+trials<-rbind(trials,data.frame(ntree=40,depth=6,eta=0.08))
+trials<-rbind(trials,data.frame(ntree=40,depth=6,eta=0.1))
+trials<-rbind(trials,data.frame(ntree=40,depth=6,eta=0.15))
+trials<-rbind(trials,data.frame(ntree=40,depth=6,eta=0.2))
+trials<-rbind(trials,data.frame(ntree=40,depth=6,eta=0.25))
+trials<-rbind(trials,data.frame(ntree=40,depth=6,eta=0.3))
+trials<-rbind(trials,data.frame(ntree=40,depth=6,eta=0.35))
+trials<-rbind(trials,data.frame(ntree=40,depth=6,eta=0.4))
+
+
+cat("iter,rocscore,rocscoreTrain,ntree,depth,eta,metric\n",file="obs/forwardSelection/obs.txt",append=TRUE)
 
 library(xgboost)
 iter = 0
