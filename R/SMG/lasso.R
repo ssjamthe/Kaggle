@@ -5,6 +5,7 @@ library(caret)
 library(randomForest)
 library(imputeR)
 library(AUC)
+library(glmnet)
 setwd("/Users/swapnil/work/Kaggle/out/SMR")
 cat("loading data")
 train<-read.csv("train.csv",stringsAsFactors=FALSE)
@@ -184,114 +185,9 @@ modelMatTrain<-model.matrix(target~.,data = trainingData)
 modelMatCv<-model.matrix(~.,data = cvData)
 modelMatTestFinal<-model.matrix(~.,data = test_proc)
 
-
-subsetVars<-regsubsets(target~.,data.frame(processedFullModelMat),nvmax = 1991,really.big = T,method="forward")
-subsetSummary<-summary(subsetVars)
-par(mfrow=c(2,2))
-plot(subsetSummary$rss,xlab="Number of Variables",ylab = "RSS",type="l")
-plot(subsetSummary$adjr2,xlab="Number of Variables",ylab = "Adj RSq",type="l")
-#1192
-adjr2ModNum<-which.max(subsetSummary$adjr2)
-plot(subsetSummary$cp,xlab="Number of Variables",ylab = "Cp",type="l")
-#672
-cpModNum<-which.min(subsetSummary$cp)
-plot(subsetSummary$bic,xlab="Number of Variables",ylab = "BIC",type="l")
-#162
-bicModNum<-which.min(subsetSummary$bic)
-
-# minErrorInd <- -1;
-# minError <- 1000000;
-# errors<-rep(NA,1990)
-# 
-# for(i in 1:1990)
-# {
-#   coefi<-coef(subsetVars,id=i)
-#   newNamesInd<-sapply(names(coefi),function(x){!(x %in% colnames(modelMatCvNew))})
-#   if(sum(newNamesInd) > 0 )
-#   {
-#     print(names(coefi)[newNamesInd])
-#   }
-#   pred<-modelMatCv[,names(coefi)]%*%coefi
-#   errors[i]<-mean((cvData$target - pred)^2)
-#   if(minError > errors[i])
-#   {
-#     minErrorInd <- i
-#     minError <- errors[i]
-#   }
-# }
-
-
-metric="adjr2"
-coefiAdjr2<-coef(subsetVars,id=adjr2ModNum)
-modelMatTrain<-modelMatTrain[,names(coefiAdjr2)]
-modelMatCv<-modelMatCv[,names(coefiAdjr2)]
-modelMatTestFinal<-modelMatTestFinal[,names(coefiAdjr2)]
-
-#modelFrameTrainAdjr2<-data.frame(modelMatTrainAdjr2)
-#modelFrameTrainAdjr2$target<-trainingData$target
-
-obs<-data.frame(iter=integer(0),rocscore=numeric(0),rocscoreTrain=numeric(0),ntree=integer(0),depth=integer(0),eta=integer(0))
-
-trials<-data.frame(ntree=integer(0),depth=integer(0),eta=integer(0))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.1502))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.1503))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.1504))
-
-
-
-
-
-cat("iter,rocscore,rocscoreTrain,ntree,depth,eta,metric\n",file="obs/forwardSelection/obs.txt",append=TRUE)
-
-library(xgboost)
-iter = 0
-bestR<--1;
-bestIter<--1;
-for(it in 1:nrow(trials))
-{
-  iter = iter + 1;
-  currEta<-trials[it,"eta"]
-  currNtree<-trials[it,"ntree"]
-  currDepth<-trials[it,"depth"]
-  
-  currTrainMat<-modelMatTrain
-  currCvMat<-modelMatCv
-  currTestMat<-modelMatTestFinal
-  
-  modelBoost<-xgboost(data = currTrainMat, label = trainingData$target, max.depth = currDepth, eta = currEta, nthread = 2, nround = currNtree, objective = "binary:logistic",verbose=0)
-  predBoost<-predict(modelBoost,currTestMat)
-  predBoostFrame<-data.frame(Id=test$ID,target=predBoost)
-  predCv<-predict(modelBoost,currCvMat)
-  r<-auc(roc(predictions = predCv,labels = factor(cvData$target)))
-  predTrain<-predict(modelBoost,currTrainMat)
-  rtrain<-auc(roc(predictions = predTrain,labels = factor(trainingData$target)))
-  
-  obs<-rbind(obs,data.frame(iter=iter,rocscore=r,rocscoreTrain=rtrain,ntree=currNtree,depth=currDepth,eta=currEta))
-  currIterLog<-paste0("iter=",iter,",rocscore=",r,",rocscoreTrain=",rtrain,",ntree=",currNtree,",depth=",currDepth,",eta=",currEta)
-  print(currIterLog)
-  
-  csvLog<-paste0(iter,r,rtrain,currNtree,currDepth,currEta,metric,"\n")
-  cat(csvLog,file="obs/forwardSelection/obs.txt",append=TRUE)
-  
-  
-  if(bestR < r)
-  {
-    
-    print(paste0("Best till now ",currIterLog,":: lastBest=",bestR,",lastBestIter=",bestIter))
-    
-    bestR<-r
-    bestIter<-iter
-    
-    print(paste0("Best till now ",currIterLog))
-    
-    write.table(predBoostFrame,file = paste0("predictions/forwardSelection/predBoost","_",currNtree,"_",currDepth,"_",currEta,"_",iter),quote = FALSE,sep = ",",row.names = FALSE)
-    
-  }
-  
-}
-
-
-
+lassoModel<-cv.glmnet(modelMatTrain,trainingData$target,alpha = 1)
+plot(lassoModel)
+bestlam<-lassoModel$lambda
 
 
 
