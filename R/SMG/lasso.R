@@ -6,6 +6,8 @@ library(randomForest)
 library(imputeR)
 library(glmnet)
 library(AUC)
+library(readr)
+library(stringdist)
 setwd("/Users/swapnil/work/Kaggle/out/SMR")
 cat("loading data")
 train<-read.csv("train.csv",stringsAsFactors=FALSE)
@@ -13,6 +15,72 @@ test<-read.csv("test.csv",stringsAsFactors=FALSE)
 test$target<-integer(nrow(test))
 
 train<-select(train,-(ID))
+
+#correcting geo for train
+
+cat("Nr of city names before cleanup:", length(unique(train$VAR_0200)), fill=T)
+
+reviewDupes <- mutate(train, City = VAR_0200, State = VAR_0237, Zip=VAR_0241) %>% 
+  select(City, State, Zip) %>%
+  mutate(stateZip = paste(Zip, State, sep="_"),
+         fullGeoID = paste(City, Zip, State, sep="_")) %>%
+  distinct()
+potentialDupes <- group_by(reviewDupes, stateZip) %>% 
+  dplyr::summarise(n = n(), 
+                   altName = first(City), # prettier: most common
+                   altID = first(fullGeoID)) %>% 
+  filter(n > 1)
+dupes <- mutate(left_join(potentialDupes, reviewDupes, by="stateZip"), 
+                dist=stringdist(altName, City)) %>% 
+  filter(dist >= 1 & dist <= 2)
+
+write_csv(select(dupes, City, State, Zip, altName), "CleanedupCities.csv")
+
+print("Preview:")
+print(head(paste(dupes$City, dupes$State, "=>", dupes$altName), 20))
+
+train <- mutate(train, fullGeoID = paste(VAR_0200, VAR_0241, VAR_0237, sep="_"))
+train <- left_join(train, select(dupes, altName, fullGeoID), by="fullGeoID") %>%
+  mutate(VAR_0200 = ifelse(is.na(altName), VAR_0200, altName)) %>%
+  select(-fullGeoID, -altName)
+# and do the same for the test set
+
+cat("Nr of city names after cleansing:", length(unique(train$VAR_0200)), fill=T)
+
+#End of correcting geo for train
+
+#correcting geo for test
+
+cat("Nr of city names before cleanup:", length(unique(test$VAR_0200)), fill=T)
+
+reviewDupes <- mutate(test, City = VAR_0200, State = VAR_0237, Zip=VAR_0241) %>% 
+  select(City, State, Zip) %>%
+  mutate(stateZip = paste(Zip, State, sep="_"),
+         fullGeoID = paste(City, Zip, State, sep="_")) %>%
+  distinct()
+potentialDupes <- group_by(reviewDupes, stateZip) %>% 
+  dplyr::summarise(n = n(), 
+                   altName = first(City), # prettier: most common
+                   altID = first(fullGeoID)) %>% 
+  filter(n > 1)
+dupes <- mutate(left_join(potentialDupes, reviewDupes, by="stateZip"), 
+                dist=stringdist(altName, City)) %>% 
+  filter(dist >= 1 & dist <= 2)
+
+write_csv(select(dupes, City, State, Zip, altName), "CleanedupCities.csv")
+
+print("Preview:")
+print(head(paste(dupes$City, dupes$State, "=>", dupes$altName), 20))
+
+test <- mutate(test, fullGeoID = paste(VAR_0200, VAR_0241, VAR_0237, sep="_"))
+test <- left_join(test, select(dupes, altName, fullGeoID), by="fullGeoID") %>%
+  mutate(VAR_0200 = ifelse(is.na(altName), VAR_0200, altName)) %>%
+  select(-fullGeoID, -altName)
+# and do the same for the test set
+
+cat("Nr of city names after cleansing:", length(unique(train$VAR_0200)), fill=T)
+
+#End of correcting geo for test
 
 col_ct = sapply(train, function(x) length(unique(x[!is.na(x)])))
 cat("Constant feature count:", length(col_ct[col_ct==1]))
@@ -205,15 +273,15 @@ obs<-data.frame(iter=integer(0),rocscore=numeric(0),rocscoreTrain=numeric(0),ntr
 trials<-data.frame(ntree=integer(0),depth=integer(0),eta=integer(0))
 trials<-rbind(trials,data.frame(ntree=2,depth=2,eta=0.1502))
 
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.15035))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.15036))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.15037))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.15038))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.15039))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.15041))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.15042))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.15043))
-trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.15044))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.150381))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.150382))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.150383))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.150384))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.150385))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.150386))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.150387))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.150388))
+trials<-rbind(trials,data.frame(ntree=50,depth=6,eta=0.150389))
 
 
 cat("iter,rocscore,rocscoreTrain,ntree,depth,eta,metric\n",file="obs/lasso/obs.txt",append=TRUE)
