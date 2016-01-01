@@ -64,7 +64,7 @@ for i,trial in enumerate(trials):
     currDepth = trial[1]
     currEta = trial[2]
 
-    param = {'max_depth':currDepth, 'eta':currEta, 'silent':2,'eval_metric': 'rmse'}
+    param = {'max_depth':currDepth, 'eta':currEta, 'silent':1,'eval_metric': 'rmse'}
     watchlist  = [(dtrain,'train')]
     bst = xgb.train(param, dtrain, currNtree, watchlist)
     trainPred = bst.predict(dtrain)
