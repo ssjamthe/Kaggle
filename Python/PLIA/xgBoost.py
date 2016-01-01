@@ -14,10 +14,10 @@ def adjustResponse(resp):
 	elif resp > 8:
 		return 8
 	else:
-		return round(resp)
+		return int(round(resp))
 
 
-os.chdir("/Users/swapnil.jamthe/work/Kaggle/out/PLIA")
+os.chdir("/Users/swapnil/work/Kaggle/out/PLIA")
 print "Hello"
 data = pd.read_csv("trans_train.csv")
 test = pd.read_csv("trans_test.csv",na_values="NA")
@@ -40,7 +40,7 @@ dCv = xgb.DMatrix(ftCv)
 dTest = xgb.DMatrix(ftTest)
 
 
-ntrees = [700,500,300,100,150,200,10,20,30,40,50,60,70,80]
+ntrees = [1,700,500,300,100,150,200,10,20,30,40,50,60,70,80]
 depths = [4,5,6,7,8,10,12,14,18,24]
 etas = [0.07,0.09,0.1,0.11,0.13,0.17,0.23,0.3]
 
@@ -88,11 +88,12 @@ for i,trial in enumerate(trials):
     	d = {"Id":test["Id"],"Response":trainPred}
     	outputDf = pd.DataFrame(data = d)
     	fileName = "predictions/python/xgBoost/predBoost" + "_" + str(currNtree) + "_" + str(currDepth) + "_" + str(currEta) + "_" + str(currIter)
-    	outputDf.to_csv(fileName,index_label=False)
+    	outputDf.to_csv(fileName,index_label=False,index=False)
 
     currIter = currIter + 1
 
     
+
 
 
 
