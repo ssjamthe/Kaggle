@@ -5,6 +5,8 @@ library(caret)
 library(Metrics)
 require(xgboost)
 library(gbm)
+library(mice)
+library(VIM)
 
 roundResponse<-function (resp)
 {
@@ -23,7 +25,7 @@ data<-read.csv("trans_train.csv")
 
 #nasFrac<-sapply(names(data),function(x){sum(is.na(data[,x]))/nrow(data)})
 #data<-data[,nasFrac==0]
-data[is.na(data)]<- -999
+data[is.na(data)]<- -9999
 
 data<-select(data,-(Id))
 trainingIndex<-createDataPartition(y=data$Response,p=0.8,list=FALSE)
@@ -32,7 +34,7 @@ cvData<-data[-trainingIndex,]
 
 testFinal<-read.csv("trans_test.csv")
 #testFinal<-testFinal[,nasFrac[1:length(nasFrac)-1]==0]
-testFinal[is.na(testFinal)]<- -999
+testFinal[is.na(testFinal)]<- -9999
 
 
 obs<-data.frame(kappa=numeric(0),kappaTrain=numeric(0),ntree=integer(0),depth=integer(0),eta=integer(0))
@@ -40,7 +42,7 @@ obs<-data.frame(kappa=numeric(0),kappaTrain=numeric(0),ntree=integer(0),depth=in
 trials<-data.frame(ntree=integer(0),depth=integer(0),eta=integer(0))
 trials<-rbind(trials,data.frame(ntree=1,depth=1,eta=0.15))
 
-ntrees<-c(100,120,140,160,10,20,30,40,50,60,70,80)
+ntrees<-c(500,100,120,140,160,10,20,30,40,50,60,70,80)
 depths<-c(3,4,5,6,7,8,10,12,14,18,20,22,24)
 etas<-c(0.05,0.07,0.09,0.1,0.11,0.13,0.17,0.23,0.3)
 

@@ -10,7 +10,7 @@ nonCategorical<-c("Id","Product_Info_4",
 "Ins_Age", "Ht", "Wt", "BMI", "Employment_Info_1"
 ,"Employment_Info_4","Employment_Info_6","Insurance_History_5"
 ,"Family_Hist_2", "Family_Hist_3", "Family_Hist_4", "Family_Hist_5"
-,"Medical_History_1", "Medical_History_15", "Medical_History_24", "Medical_History_32","Response")
+,"Medical_History_1","Medical_History_10", "Medical_History_15", "Medical_History_24", "Medical_History_32","Response")
 
 transData<-data.frame(dummyCol=integer(nrow(data)))
 for(col in names(data))

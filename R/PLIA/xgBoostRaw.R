@@ -23,7 +23,7 @@ data<-read.csv("train.csv")
 testFinal<-read.csv("test.csv")
 
 fullFrame<-rbind(select(data,-(Response)),testFinal)
-fullFrame[is.na(fullFrame)]<- -999
+fullFrame[is.na(fullFrame)]<- -9999
 nasFrac<-sapply(names(fullFrame),function(x){sum(is.na(fullFrame[,x]))/nrow(fullFrame)})
 fullFrame<-fullFrame[,nasFrac==0]
 fullFrame<-select(fullFrame,-(Id))
@@ -44,7 +44,7 @@ obs<-data.frame(kappa=numeric(0),kappaTrain=numeric(0),ntree=integer(0),depth=in
 trials<-data.frame(ntree=integer(0),depth=integer(0),eta=integer(0))
 trials<-rbind(trials,data.frame(ntree=1,depth=1,eta=0.15))
 
-ntrees<-c(10,20,30,40,50,60,70,80)
+ntrees<-c(100,200,300,10,20,30,40,50,60,70,80)
 depths<-c(3,4,5,6,7,8,10,12,14)
 etas<-c(0.05,0.07,0.09,0.11,0.13,0.17,0.23,0.3)
 
