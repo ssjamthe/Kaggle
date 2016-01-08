@@ -1,6 +1,7 @@
 set.seed(1988)
 library(mice)
 library(VIM)
+library(dplyr)
 
 setwd("/Users/swapnil/work/Kaggle/out/PLIA")
 data<-read.csv("trans_train.csv")
@@ -14,7 +15,16 @@ cols_more_nas<-names(data)[nas_in_cols_fraction>0.5]
 
 test<-read.csv("trans_test.csv")
 
-dataSel<-data[,!names(train_numr) %in% cols_more_nas]
-testSel<-testFinal[,!names(test_numr) %in% cols_more_nas]
 
-imp<-mice(data,m=1,maxit=10,meth='pmm',seed=1988)
+dataSel<-data[,!names(data) %in% cols_more_nas]
+testSel<-test[,!names(test) %in% cols_more_nas]
+
+imp<-mice(dataSel,m=1,maxit=10,meth='pmm',seed=1988)
+
+write.table(complete(imp),file = "imp_train_10iter_50percent",quote = FALSE,sep = ",",row.names = FALSE)
+
+impTest<-mice(testSel,m=1,maxit=10,meth='pmm',seed=1988)
+
+write.table(complete(impTest),file = "imp_test_10iter_50percent",quote = FALSE,sep = ",",row.names = FALSE)
+
+
