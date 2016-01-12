@@ -19,12 +19,12 @@ test<-read.csv("trans_test.csv")
 dataSel<-data[,!names(data) %in% cols_more_nas]
 testSel<-test[,!names(test) %in% cols_more_nas]
 
-imp<-mice(dataSel,m=1,maxit=10,meth='pmm',seed=1988)
+imp<-mice(dataSel,m=1,maxit=100,meth='pmm',seed=1988)
 
-write.table(complete(imp),file = "imp_train_10iter_50percent",quote = FALSE,sep = ",",row.names = FALSE)
+write.table(complete(imp),file = "imp_train_100iter_50percent",quote = FALSE,sep = ",",row.names = FALSE)
 
-impTest<-mice(testSel,m=1,maxit=10,meth='pmm',seed=1988)
+impTest<-mice(testSel,m=1,maxit=100,meth='pmm',seed=1988)
 
-write.table(complete(impTest),file = "imp_test_10iter_50percent",quote = FALSE,sep = ",",row.names = FALSE)
+write.table(complete(impTest),file = "imp_test_100iter_50percent",quote = FALSE,sep = ",",row.names = FALSE)
 
 
