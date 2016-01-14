@@ -29,7 +29,7 @@ scoreFunc<-function(scoreData,lev,model)
   names(r)<-"squaredKappa"
 }
 
-setwd("/Users/swapnil/work/Kaggle/out/PLIA")
+setwd("/Users/swapnil.jamthe/work/Kaggle/out/PLIA")
 
 
 data<-read.csv("imp_train_10iter_50percent")
