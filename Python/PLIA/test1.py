@@ -19,5 +19,6 @@ d = DV(sparse = True)
 d1 = d.fit_transform(df1.T.to_dict().values())
 d1
 
-df1Data = {"col1" : [1,20,30],"col2" : ["swap","kals1","bang"],"col3":[33,44,55]}
-df1 = pd.DataFrame(data = df1Data)
+df2Data = {"col1" : [1,20,30,40],"col2" : ["swap","kals1","bang","nag"],"col3":[22,33,44,55]}
+df2 = pd.DataFrame(data = df2Data)
+d1 = d.transform(df2.T.to_dict().values())
