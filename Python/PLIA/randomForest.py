@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.feature_extraction import DictVectorizer as DV
 from sklearn.cross_validation import train_test_split
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestRegressor
 from skll import kappa
 from sklearn.externals import joblib
 
@@ -17,7 +17,7 @@ def adjustResponse(resp):
 		return int(round(resp))
 
 
-os.chdir("/Users/swapnil/work/Kaggle/out/PLIA")
+os.chdir("/Users/swapnil.jamthe/work/Kaggle/out/PLIA")
 
 print "Hello"
 data = pd.read_csv("imp_train_10iter_50percent")
@@ -36,10 +36,10 @@ ftTrain = d.fit_transform(trainData.T.to_dict().values())
 ftCv = d.transform(cvData.T.to_dict().values())
 ftTest = d.transform(test.T.to_dict().values())
 
-clf = RandomForestClassifier(n_estimators=1000)
+clf = RandomForestRegressor(n_estimators=10)
 clf.fit(ftTrain,yTrain)
 
-joblib.dump(clf,"rfmodels/RFModel1000")
+joblib.dump(clf,"RFModel10/RFModel10")
 
 
 trainPred = clf.predict(ftTrain)
@@ -51,6 +51,8 @@ cvPred = clf.predict(ftCv)
 cvPred = [adjustResponse(resp) for resp in cvPred]
 kCv = kappa(yCv,cvPred,weights="quadratic")
 print "cvPred : " + str(kCv)
+
+
 
 
 
