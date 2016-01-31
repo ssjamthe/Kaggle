@@ -17,10 +17,10 @@ def adjustResponse(resp):
 		return int(round(resp))
 
 
-os.chdir("/Users/swapnil.jamthe/work/Kaggle/out/PLIA")
+os.chdir("/Users/swapnil/work/Kaggle/out/PLIA")
 
 print "Hello"
-data = pd.read_csv("imp_train_10iter_50percent")
+data = pd.read_csv("imp_train_100iter_50percent")
 test = pd.read_csv("trans_test.csv",na_values="NA")
 d = DV(sparse = True)
 
@@ -36,10 +36,10 @@ ftTrain = d.fit_transform(trainData.T.to_dict().values())
 ftCv = d.transform(cvData.T.to_dict().values())
 ftTest = d.transform(test.T.to_dict().values())
 
-clf = RandomForestRegressor(n_estimators=10)
+clf = RandomForestRegressor(n_estimators=500)
 clf.fit(ftTrain,yTrain)
 
-joblib.dump(clf,"RFModel10/RFModel10")
+joblib.dump(clf,"RFModel500/RFModel500")
 
 
 trainPred = clf.predict(ftTrain)
@@ -51,6 +51,7 @@ cvPred = clf.predict(ftCv)
 cvPred = [adjustResponse(resp) for resp in cvPred]
 kCv = kappa(yCv,cvPred,weights="quadratic")
 print "cvPred : " + str(kCv)
+
 
 
 

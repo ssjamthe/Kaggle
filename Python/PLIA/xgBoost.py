@@ -19,7 +19,7 @@ def adjustResponse(resp):
 
 os.chdir("/Users/swapnil/work/Kaggle/out/PLIA")
 print "Hello"
-data = pd.read_csv("trans_train.csv")
+data = pd.read_csv("imp_train_100iter_50percent")
 test = pd.read_csv("trans_test.csv",na_values="NA")
 d = DV(sparse = True)
 
@@ -42,9 +42,9 @@ dCv = xgb.DMatrix(ftCv)
 dTest = xgb.DMatrix(ftTest)
 
 
-ntrees = [100,300,500,700,150,200,10,20,30,40,50,60,70,80]
-depths = [4,5,6,7,8,10,12,14,18,24]
-etas = [0.07,0.09,0.1,0.11,0.13,0.17,0.23,0.3]
+ntrees = [1000,500,100,300,500,700,150,200,10,20,30,40,50,60,70,80]
+depths = [3,4,5,6,7,8,10,12,14,18,24]
+etas = [0.01,0.03,0.07,0.09,0.1,0.11,0.13,0.17,0.23,0.3]
 
 trials = []
 

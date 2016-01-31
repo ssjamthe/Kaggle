@@ -17,11 +17,11 @@ def adjustResponse(resp):
 
 print "Hello"
 
-os.chdir("/Users/swapnil.jamthe/work/Kaggle/out/PLIA")
+os.chdir("/Users/swapnil/work/Kaggle/out/PLIA")
 
-clf = joblib.load("RFModel10/RFModel10")
+clf = joblib.load("RFModel1000/RFModel1000")
 
-data = pd.read_csv("imp_train_10iter_50percent")
+data = pd.read_csv("imp_train_100iter_50percent")
 test = pd.read_csv("trans_test.csv",na_values="NA")
 d = DV(sparse = True)
 
@@ -51,7 +51,7 @@ print "Ktrain : " + str(kTrain)
 
 trainPredData = {"Id":trainId,"Response" : yTrain,"predResponse" : trainPred,"origPred" : origPredTrain}
 trainOutputDf = pd.DataFrame(data = trainPredData)
-fileName = "cvPredictions/python/randomForest/model_train_10"
+fileName = "cvPredictions/python/randomForest/model_train_100"
 trainOutputDf.to_csv(fileName,index_label=False,index=False)
 
 cvPred = clf.predict(ftCv)
@@ -63,8 +63,10 @@ print "cvPred : " + str(kCv)
 
 cvPredData = {"Id":cvId,"Response" : yCv,"predResponse" : cvPred,"origPred" : origPredCv}
 cvOutputDf = pd.DataFrame(data = cvPredData)
-fileName = "cvPredictions/python/randomForest/model_cv_10"
+fileName = "cvPredictions/python/randomForest/model_cv_100"
 cvOutputDf.to_csv(fileName,index_label=False,index=False)
+
+
 
 
 
