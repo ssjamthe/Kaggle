@@ -15,7 +15,7 @@ nonCategorical<-c("Id","Product_Info_4",
 transData<-data.frame(dummyCol=integer(nrow(data)))
 for(col in names(data))
 {
-  if(col %in% nonCategorical)
+  if(col %in% nonCategorical | grepl("Medical_Keyword",col))
   {
     transData[,col] = data[,col]
   }
