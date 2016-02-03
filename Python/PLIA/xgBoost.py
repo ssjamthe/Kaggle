@@ -19,7 +19,7 @@ def adjustResponse(resp):
 
 os.chdir("/Users/swapnil/work/Kaggle/out/PLIA")
 print "Hello"
-data = pd.read_csv("imp_train_100iter_50percent")
+data = pd.read_csv("trans_train.csv")
 test = pd.read_csv("trans_test.csv",na_values="NA")
 d = DV(sparse = True)
 

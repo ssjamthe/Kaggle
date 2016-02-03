@@ -21,11 +21,11 @@ roundResponse<-function (resp)
 
 setwd("/Users/swapnil/work/Kaggle/out/PLIA")
 
-data<-read.csv("imp_train_10iter_50percent")
+data<-read.csv("trans_train.csv")
 
 #nasFrac<-sapply(names(data),function(x){sum(is.na(data[,x]))/nrow(data)})
 #data<-data[,nasFrac==0]
-#data[is.na(data)]<- -9999
+data[is.na(data)]<- -9999
 
 data<-select(data,-(Id))
 trainingIndex<-createDataPartition(y=data$Response,p=0.8,list=FALSE)
