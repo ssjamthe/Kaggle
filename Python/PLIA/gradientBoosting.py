@@ -16,13 +16,14 @@ def adjustResponse(resp):
 		return int(round(resp))
 
 
-os.chdir("/Users/swapnil/work/Kaggle/out/PLIA")
+os.chdir("/Users/swapnil.jamthe/work/Kaggle/out/PLIA")
 
 print "Hello"
-data = pd.read_csv("imp_train_100iter_50percent")
-test = pd.read_csv("trans_test.csv",na_values="NA")
+data = pd.read_csv("trans_train_sumMK.csv")
+test = pd.read_csv("trans_train_sumMK.csv",na_values="NA")
 d = DV(sparse = False)
 
+data = data.fillna(-9999)
 test = test.fillna(-9999)
 
 
@@ -38,7 +39,7 @@ ftTest = d.transform(test.T.to_dict().values())
 clf = GradientBoostingRegressor(n_estimators=1500,max_depth=8,min_samples_split=10,min_samples_leaf=2,max_features="auto",verbose=1,random_state=1988)
 clf.fit(ftTrain,yTrain)
 
-#joblib.dump(clf,"GBMModel50/GBMModel50")
+joblib.dump(clf,"GBMModel1500_sumMK/GBMModel1500")
 
 
 trainPred = clf.predict(ftTrain)

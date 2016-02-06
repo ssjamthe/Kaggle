@@ -3,7 +3,7 @@ library(leaps)
 library(dplyr)
 library(caret)
 
-setwd("/Users/swapnil/work/Kaggle/out/PLIA")
+setwd("/Users/swapnil.jamthe/work/Kaggle/out/PLIA")
 data<-read.csv("train.csv")
 
 nonCategorical<-c("Id","Product_Info_4", 

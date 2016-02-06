@@ -30,7 +30,7 @@ transDataByMkSum<-function(data)
   return(data)
 }
 
-setwd("/Users/swapnil/work/Kaggle/out/PLIA")
+setwd("/Users/swapnil.jamthe/work/Kaggle/out/PLIA")
 data<-read.csv("trans_train.csv")
 data<-transDataByMkSum(data)
 

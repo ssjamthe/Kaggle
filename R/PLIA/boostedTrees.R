@@ -19,9 +19,9 @@ roundResponse<-function (resp)
   resp
 }
 
-setwd("/Users/swapnil/work/Kaggle/out/PLIA")
+setwd("/Users/swapnil.jamthe/work/Kaggle/out/PLIA")
 
-data<-read.csv("trans_train.csv")
+data<-read.csv("trans_train_sumMK.csv")
 
 #nasFrac<-sapply(names(data),function(x){sum(is.na(data[,x]))/nrow(data)})
 #data<-data[,nasFrac==0]
@@ -32,7 +32,7 @@ trainingIndex<-createDataPartition(y=data$Response,p=0.8,list=FALSE)
 trainingData<-data[trainingIndex,]
 cvData<-data[-trainingIndex,]
 
-testFinal<-read.csv("trans_test.csv")
+testFinal<-read.csv("trans_test_sumMK.csv")
 #testFinal<-testFinal[,nasFrac[1:length(nasFrac)-1]==0]
 testFinal[is.na(testFinal)]<- -9999
 
@@ -44,7 +44,7 @@ trials<-rbind(trials,data.frame(ntree=1,depth=1,eta=0.15))
 
 ntrees<-c(5000,3000,1000,100,120,140,160,10,20,30,40,50,60,70,80)
 depths<-c(3,4,5,6,7,8,10,12,14,18,20,22,24)
-etas<-c(0.09,0.1,0.11,0.13,0.17,0.23,0.3)
+etas<-c(0.001,0.003,0.005,0.007,0.009,0.01,0.03,0.05,0.07,0.09,0.1,0.11,0.13,0.17,0.23,0.3)
 
 for(nt in  ntrees)
 {

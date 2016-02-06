@@ -17,10 +17,10 @@ roundResponse<-function (resp)
   resp
 }
 
-setwd("/Users/swapnil/work/Kaggle/out/PLIA")
+setwd("/Users/swapnil.jamthe/work/Kaggle/out/PLIA")
 
-data<-read.csv("trans_train.csv")
-testFinal<-read.csv("trans_test.csv")
+data<-read.csv("trans_train_sumMK.csv")
+testFinal<-read.csv("trans_test_sumMK.csv")
 
 fullFrame<-rbind(select(data,-(Response)),testFinal)
 fullFrame[is.na(fullFrame)]<- -9999
@@ -45,8 +45,8 @@ trials<-data.frame(ntree=integer(0),depth=integer(0),eta=integer(0))
 trials<-rbind(trials,data.frame(ntree=1,depth=1,eta=0.15))
 
 ntrees<-c(5000,3000,1500,700,100,300,500,700,150,200,10,20,30,40,50,60,70,80)
-depths<-c(4,5,6,7,8,10,12,14,18,24)
-etas<-c(0.07,0.09,0.1,0.11,0.13,0.17,0.23,0.3)
+depths<-c(3,4,5,6,7,8,10,12,14,18,24)
+etas<-c(0.001,0.003,0.005,0.007,0.009,0.01,0.03,0.05,0.07,0.09,0.1,0.11,0.13,0.17,0.23,0.3)
 
 for(nt in  ntrees)
 {

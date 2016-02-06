@@ -17,10 +17,10 @@ def adjustResponse(resp):
 		return int(round(resp))
 
 
-os.chdir("/Users/swapnil/work/Kaggle/out/PLIA")
+os.chdir("/Users/swapnil.jamthe/work/Kaggle/out/PLIA")
 print "Hello"
-data = pd.read_csv("trans_train.csv")
-test = pd.read_csv("trans_test.csv",na_values="NA")
+data = pd.read_csv("trans_train_sumMK.csv")
+test = pd.read_csv("trans_train_sumMK.csv",na_values="NA")
 d = DV(sparse = True)
 
 data = data.fillna(-9999)
@@ -42,8 +42,8 @@ dCv = xgb.DMatrix(ftCv)
 dTest = xgb.DMatrix(ftTest)
 
 
-ntrees = [5000,3000,1000,500,100,300,500,700,150,200,10,20,30,40,50,60,70,80]
-depths = [4,5,6,7,8,10,12,14,18,24]
+ntrees = [2000,100,300,500,700,150,200,10,20,30,40,50,60,70,80]
+depths = [2,3,4,5,6,7,8,10,12,14,18,24]
 etas = [0.01,0.03,0.07,0.09,0.1,0.11,0.13,0.17,0.23,0.3]
 
 trials = []
