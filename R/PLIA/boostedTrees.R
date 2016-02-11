@@ -19,7 +19,7 @@ roundResponse<-function (resp)
   resp
 }
 
-setwd("/Users/swapnil.jamthe/work/Kaggle/out/PLIA")
+setwd("/Users/swapnil/work/Kaggle/out/PLIA")
 
 data<-read.csv("trans_train_sumMK.csv")
 
