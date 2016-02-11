@@ -85,8 +85,8 @@ for i,trial in enumerate(trials):
     cvPred = bst.predict(dCv)
     cvPred = [adjustResponse(resp) for resp in cvPred]
     k = kappa(yCv,cvPred,weights="quadratic")
-    trainPred = bst.predict(dTest)
-    trainPred = [adjustResponse(resp) for resp in trainPred]
+    testPred = bst.predict(dTest)
+    testPred = [adjustResponse(resp) for resp in testPred]
 
     currIterLog = "iter=" + str(currIter) + ",k=" + str(k) + ",ktrain=" + str(kTrain) + ",ntree=" + str(currNtree) + ", depth=" + str(currDepth) + ",eta=" + str(currEta)+ ",best was " + str(bestKappa) + " best iter was " + str(bestIter)
     print currIterLog
@@ -99,7 +99,7 @@ for i,trial in enumerate(trials):
     	bestKappa = k
     	bestIter = currIter
     	print("Best till now " + currIterLog)
-    	d = {"Id":test["Id"],"Response":trainPred}
+    	d = {"Id":test["Id"],"Response":testPred}
     	outputDf = pd.DataFrame(data = d)
     	fileName = "predictions/python/xgBoostSameCvMat/predBoost" + "_" + str(currNtree) + "_" + str(currDepth) + "_" + str(currEta) + "_" + str(currIter)
     	outputDf.to_csv(fileName,index_label=False,index=False)
