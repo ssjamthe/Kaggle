@@ -46,7 +46,7 @@ yTrain = dataPred[msk]
 yCv = dataPred[~msk]
 
 
-clf = GradientBoostingRegressor(n_estimators=3000,max_depth=8,min_samples_split=10,min_samples_leaf=2,max_features="auto",verbose=1,random_state=1988)
+clf = GradientBoostingRegressor(n_estimators=3000,max_depth=8,min_samples_split=30,min_samples_leaf=8,max_features="auto",verbose=1,random_state=1988)
 clf.fit(ftTrain,yTrain)
 
 
@@ -60,6 +60,21 @@ cvPred = [adjustResponse(resp) for resp in cvPred]
 kCv = kappa(yCv,cvPred,weights="quadratic")
 print "cvPred : " + str(kCv)
 
-joblib.dump(clf,"GBMModel3000_sameCvMat/GBMModel3000_sameCvMat")
+joblib.dump(clf,"GBMModel3000_2_sameCvMat/GBMModel3000_2_sameCvMat")
 
 
+clf = GradientBoostingRegressor(n_estimators=4000,max_depth=8,min_samples_split=30,min_samples_leaf=8,max_features="auto",verbose=1,random_state=1988)
+clf.fit(ftTrain,yTrain)
+
+
+trainPred = clf.predict(ftTrain)
+trainPred = [adjustResponse(resp) for resp in trainPred]
+kTrain = kappa(yTrain,trainPred,weights="quadratic")
+print "Ktrain : " + str(kTrain)
+
+cvPred = clf.predict(ftCv)
+cvPred = [adjustResponse(resp) for resp in cvPred]
+kCv = kappa(yCv,cvPred,weights="quadratic")
+print "cvPred : " + str(kCv)
+
+joblib.dump(clf,"GBMModel4000_2_sameCvMat/GBMModel4000_2_sameCvMat")

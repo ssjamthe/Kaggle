@@ -45,10 +45,10 @@ ftCv = ftData[~msk,0:ftData.shape[1]]
 yTrain = dataPred[msk]
 yCv = dataPred[~msk]
 
-clf = RandomForestRegressor(n_estimators=2000)
+clf = RandomForestRegressor(n_estimators=5000)
 clf.fit(ftTrain,yTrain)
 
-joblib.dump(clf,"RFModel2000_sameCvMat/RFModel2000_sameCvMat")
+joblib.dump(clf,"RFModel5000_sameCvMat/RFModel5000_sameCvMat")
 
 
 trainPred = clf.predict(ftTrain)
