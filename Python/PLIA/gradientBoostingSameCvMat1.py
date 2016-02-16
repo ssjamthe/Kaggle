@@ -49,6 +49,9 @@ yCv = dataPred[~msk]
 clf = GradientBoostingRegressor(n_estimators=3000,max_depth=5,min_samples_split=30,min_samples_leaf=8,max_features="auto",verbose=1,random_state=1988)
 clf.fit(ftTrain,yTrain)
 
+#Ktrain : 0.843041771883
+#cvPred : 0.605746714786
+
 
 trainPred = clf.predict(ftTrain)
 trainPred = [adjustResponse(resp) for resp in trainPred]
@@ -66,6 +69,8 @@ joblib.dump(clf,"GBMModel3000_1_sameCvMat/GBMModel3000_1_sameCvMat")
 clf = GradientBoostingRegressor(n_estimators=4000,max_depth=5,min_samples_split=30,min_samples_leaf=8,max_features="auto",verbose=1,random_state=1988)
 clf.fit(ftTrain,yTrain)
 
+#Ktrain : 0.868095118116
+#cvPred : 0.604384186156
 
 trainPred = clf.predict(ftTrain)
 trainPred = [adjustResponse(resp) for resp in trainPred]
